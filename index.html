@@ -1,0 +1,182 @@
+<!DOCTYPE html><html lang="ja">
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>Moley</title><link rel="manifest" href="manifest.json"><style>
+
+:root{
+--bg:#0f1115;
+--panel:#171a21;
+--text:#e7e9ee;
+--muted:#8a90a2;
+--accent:#7c7cff;
+}
+
+*{
+box-sizing:border-box;
+}
+
+body{
+margin:0;
+height:100vh;
+background:var(--bg);
+color:var(--text);
+font-family:system-ui,-apple-system,Segoe UI,Roboto;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+overflow:hidden;
+}
+
+body::before{
+content:"";
+position:fixed;
+width:140vmax;
+height:140vmax;
+background:radial-gradient(circle,var(--accent)0%,transparent60%);
+opacity:.04;
+animation:breathe 10s ease-in-out infinite;
+}
+
+@keyframes breathe{
+0%{transform:scale(.95)}
+50%{transform:scale(1.05)}
+100%{transform:scale(.95)}
+}
+
+header{
+position:absolute;
+top:26px;
+font-size:14px;
+color:var(--muted);
+letter-spacing:.08em;
+}
+
+#game{
+width:280px;
+height:280px;
+position:relative;
+}
+
+.mole{
+width:56px;
+height:56px;
+border-radius:50%;
+background:var(--accent);
+position:absolute;
+animation:pop .18s ease-out;
+box-shadow:0 0 12px rgba(124,124,255,.4);
+}
+
+@keyframes pop{
+0%{transform:scale(.3);opacity:0}
+70%{transform:scale(1.1)}
+100%{transform:scale(1)}
+}
+
+button{
+margin-top:40px;
+background:none;
+border:1px solid #2a2f3a;
+color:var(--text);
+padding:10px 22px;
+border-radius:10px;
+font-size:14px;
+letter-spacing:.05em;
+}
+
+button:active{
+transform:scale(.96);
+}
+
+footer{
+position:absolute;
+bottom:28px;
+font-size:13px;
+color:var(--muted);
+}
+
+</style></head><body><header id="timer">60</header><div id="game"></div><button id="start">start</button>
+
+<footer id="msg"></footer><script>
+
+const game=document.getElementById("game")
+const timerEl=document.getElementById("timer")
+const startBtn=document.getElementById("start")
+const msg=document.getElementById("msg")
+
+let running=false
+let time=60
+
+function spawn(){
+
+if(!running)return
+
+const mole=document.createElement("div")
+mole.className="mole"
+
+const area=220
+
+mole.style.left=Math.random()*area+"px"
+mole.style.top=Math.random()*area+"px"
+
+mole.onclick=()=>{
+if(navigator.vibrate)navigator.vibrate(8)
+mole.remove()
+}
+
+game.appendChild(mole)
+
+setTimeout(()=>mole.remove(),700)
+
+const next=450+Math.random()*450
+setTimeout(spawn,next)
+
+}
+
+function start(){
+
+if(running)return
+
+running=true
+time=60
+
+msg.textContent=""
+timerEl.textContent=time
+
+startBtn.disabled=true
+startBtn.style.opacity=.4
+
+spawn()
+
+const countdown=setInterval(()=>{
+
+time--
+timerEl.textContent=time
+
+if(time<=0){
+
+running=false
+clearInterval(countdown)
+
+game.innerHTML=""
+
+timerEl.textContent=""
+msg.textContent="おつかれさま"
+
+startBtn.disabled=false
+startBtn.style.opacity=1
+
+}
+
+},1000)
+
+}
+
+startBtn.onclick=start
+
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js")
+}
+
+</script></body>
+</html>
