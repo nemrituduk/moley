@@ -394,7 +394,37 @@ const DOT_LIFE_MS  = 2500;
 // ── STATE ──
 let gameMode = 30, timeLeft = 30;
 let timerInterval = null, dotInterval = null;
-let activeDot = null, lastIdx = -1;
+let activeDot = null, recentIdxs = [];
+
+// Blue-noise style: convert flat index to grid (col, row)
+function idxToPos(i) { return { c: i % COLS, r: Math.floor(i / COLS) }; }
+
+// Chebyshev distance on grid (max of col/row diff)
+function gridDist(i, j) {
+  const a = idxToPos(i), b = idxToPos(j);
+  return Math.max(Math.abs(a.c - b.c), Math.abs(a.r - b.r));
+}
+
+// Pick next cell: avoid recent history AND immediate neighbors
+function pickNextIdx() {
+  // Try up to 20 times to find a "far enough" cell
+  const MIN_DIST = 2; // must be at least 2 steps away from each recent cell
+  let best = -1, bestMinDist = -1;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const candidate = Math.floor(Math.random() * TOTAL);
+    const minD = recentIdxs.length === 0
+      ? 99
+      : Math.min(...recentIdxs.map(r => gridDist(candidate, r)));
+    if (minD >= MIN_DIST) return candidate; // good enough, use it
+    if (minD > bestMinDist) { bestMinDist = minD; best = candidate; }
+  }
+  return best >= 0 ? best : Math.floor(Math.random() * TOTAL);
+}
+
+function recordIdx(idx) {
+  recentIdxs.push(idx);
+  if (recentIdxs.length > 3) recentIdxs.shift();
+}
 
 // ── SCREENS ──
 function showScreen(id) {
@@ -423,9 +453,8 @@ function cellSize() {
 function spawnDot() {
   if (activeDot) clearDot(activeDot, false);
 
-  let idx;
-  do { idx = Math.floor(Math.random() * TOTAL); } while (idx === lastIdx);
-  lastIdx = idx;
+  const idx = pickNextIdx();
+  recordIdx(idx);
 
   const cell = document.querySelectorAll('.cell')[idx];
   const size = Math.round(cellSize() * DOT_RATIO);
