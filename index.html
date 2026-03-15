@@ -213,7 +213,7 @@
 
   .ripple {
     position: absolute; border-radius: 50%;
-    border: 2px solid rgba(78,205,196,0.5);
+    border: 2px solid rgba(124,115,255,0.5);
     transform: scale(0); opacity: 1;
     animation: rippleOut 0.42s ease-out forwards;
     pointer-events: none;
@@ -293,7 +293,7 @@
     border-radius: 14px;
     color: var(--text);
     cursor: pointer;
-    padding: 15px 44px;
+    padding: 10px 24px;
     font-size: 14px; font-weight: 700;
     font-family: var(--font);
     display: flex; align-items: center; gap: 8px;
@@ -307,7 +307,7 @@
     transform: scale(0.96);
   }
 
-  .replay-icon { font-size: 15px; color: var(--accent); }
+  .replay-icon { font-size: 25px; color: var(--accent); display: inline-block; transform: translateY(-2px); line-height: 1; }
 
   /* Burst */
   .burst {
@@ -375,7 +375,7 @@
       <span class="end-breath-label">ゆっくり息をして</span>
     </div>
     <button class="replay-btn" onclick="showScreen('start-screen')">
-      <span class="replay-icon">↺</span>もう一度
+      <span class="replay-icon">↺</span>もういちど
     </button>
   </div>
 
